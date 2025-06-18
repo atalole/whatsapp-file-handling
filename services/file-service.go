@@ -38,9 +38,10 @@ func FileUpload(file multipart.File, fileHeader *multipart.FileHeader, mimeType 
 	// Create S3 client
 	client := s3.NewFromConfig(cfg)
 	uploader := manager.NewUploader(client)
-
+	var keys = SpittedName(fileHeader.Filename)
+	fmt.Println("keys", keys)
 	// Generate unique file name
-	key := fmt.Sprintf("whatsapp-media-library/%d_%s", time.Now().Unix(), fileHeader.Filename)
+	key := fmt.Sprintf("whatsapp-media-library/%d_%s", time.Now().Unix(), keys)
 
 	// Upload input
 	uploadInput := &s3.PutObjectInput{
@@ -60,6 +61,7 @@ func FileUpload(file multipart.File, fileHeader *multipart.FileHeader, mimeType 
 	}
 
 	// Return the file URL
+
 	fileURL := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, key)
 	return fileURL, nil
 
@@ -94,4 +96,11 @@ func DetectMimeAndEncoding(buffer []byte, filename string) (string, string) {
 	}
 
 	return mimeType, "binary"
+}
+
+func SpittedName(Filename string) string {
+	var spittedName = strings.Split(Filename, ".")
+	var filename = time.Now().Format("20060102150405")
+	return filename + "." + spittedName[len(spittedName)-1]
+
 }

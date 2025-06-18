@@ -2,8 +2,10 @@ package fileController
 
 import (
 	"fmt"
+	"net/http"
 	fileServices "whatsapp_file_handling/services"
 	structs "whatsapp_file_handling/structs"
+	"whatsapp_file_handling/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +15,7 @@ func UploadFileHandler(c *gin.Context) {
 	if err != nil {
 		fmt.Println("Error while reading file:", err)
 
-		c.JSON(400, gin.H{"message": "file not found", "status": 400})
+		c.JSON(http.StatusBadRequest, gin.H{"message": utils.FileNotFound, "status": http.StatusBadRequest})
 		return
 	}
 	defer file.Close()
@@ -22,9 +24,9 @@ func UploadFileHandler(c *gin.Context) {
 	buffer := make([]byte, 512)
 	_, err = file.Read(buffer)
 	if err != nil {
-		c.JSON(500, gin.H{
-			"message": "failed to read file",
-			"status":  500,
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": utils.FailedToReadFile,
+			"status":  http.StatusBadRequest,
 			"error":   err.Error(),
 		})
 		return
@@ -32,9 +34,9 @@ func UploadFileHandler(c *gin.Context) {
 
 	// Reset the file pointer after reading
 	if _, err := file.Seek(0, 0); err != nil {
-		c.JSON(500, gin.H{
-			"message": "failed to reset file pointer",
-			"status":  500,
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": utils.FailedToResetFilePointer,
+			"status":  http.StatusBadRequest,
 			"error":   err.Error(),
 		})
 		return
@@ -65,9 +67,9 @@ func UploadFileHandler(c *gin.Context) {
 	uploadResult := <-fileUploadChan
 
 	if uploadResult.Err != nil {
-		c.JSON(500, gin.H{"error": "upload failed"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "upload failed", "status": http.StatusInternalServerError})
 		return
 	}
 
-	c.JSON(200, gin.H{"file_url": uploadResult.URL})
+	c.JSON(200, gin.H{"data": gin.H{"file_url": uploadResult.URL}, "message": utils.Success, "status": http.StatusOK})
 }

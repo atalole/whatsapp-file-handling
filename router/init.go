@@ -18,5 +18,5 @@ func RouterInit(route *gin.Engine) {
 		c.JSON(200, gin.H{"message": "healthy", "status": 200})
 	})
 
-	groupRoute.POST("/upload", fileController.UploadFileHandler)
+	groupRoute.POST("/upload", middlewares.CheckAuth, fileController.UploadFileHandler)
 }
