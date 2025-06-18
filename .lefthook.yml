@@ -1,0 +1,10 @@
+pre-commit:
+  commands:
+    gofmt:
+      run: gofmt -s -w .
+    govet:
+      run: go vet ./...
+    golint:
+      run: golint ./...
+    tests:
+      run: go test ./...
