@@ -1,6 +1,7 @@
 package initializers
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -11,7 +12,7 @@ import (
 var DB *gorm.DB
 
 func ConnectDB() {
-
+	fmt.Println("Using DB URL:", os.Getenv("DB_URL"))
 	dsn := os.Getenv("DB_URL")
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
